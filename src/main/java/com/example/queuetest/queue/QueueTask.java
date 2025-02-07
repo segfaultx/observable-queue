@@ -3,6 +3,7 @@ package com.example.queuetest.queue;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ScheduledFuture;
@@ -10,6 +11,7 @@ import java.util.concurrent.ScheduledFuture;
 @Getter
 @Setter
 @Builder
+@ToString
 class QueueTask {
 
     Runnable task;

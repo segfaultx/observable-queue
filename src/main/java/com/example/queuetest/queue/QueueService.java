@@ -2,7 +2,6 @@ package com.example.queuetest.queue;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -20,10 +19,15 @@ public class QueueService {
     private Thread workerThread;
 
     @PostConstruct
-    @SneakyThrows
     public void setup() {
         log.info("Starting worker thread for queue processing");
-        workerThread = Thread.ofVirtual().start(this::processQueue);
+        workerThread = Thread.ofVirtual().start(() -> {
+            try {
+                processQueue();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
         log.info("Successfully started worker thread for queue processing");
     }
 
@@ -32,7 +36,7 @@ public class QueueService {
     }
 
     public void startWorkerThread() {
-        workerThread.start();
+        setup();
     }
 
 
@@ -64,6 +68,7 @@ public class QueueService {
     }
 
     private void cancelTask(QueueTask task) {
+        log.info("Cancelling task {}", task);
         if (queue.remove(task)) {
             task.backChannel.add(TaskStatus.TIMEOUT);
         }
@@ -72,8 +77,10 @@ public class QueueService {
     private void processQueue() throws InterruptedException {
         while (!Thread.interrupted()) {
             var queueTask = queue.take();
+            log.info("Processing queue task: {}", queueTask);
 
             if (queueTask.getTaskPriority() == TaskPriority.REGULAR && queueContainsPriorityTasks()) {
+                log.info("Put regular task back in queue due to priority task taking precedence");
                 queue.put(queueTask);
                 continue;
             }
