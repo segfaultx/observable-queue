@@ -1,15 +1,16 @@
 package com.example.queuetest.queue;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ScheduledFuture;
 
+@Getter
+@Setter
 @Builder
 @ToString
+@FieldDefaults(level = AccessLevel.PRIVATE)
 class QueueTask {
 
     Runnable task;

@@ -44,14 +44,14 @@ public class QueueService {
         var queueTask = createQueueTask(task, TaskPriority.PRIORITY, TimeUnit.SECONDS);
         queue.add(queueTask);
 
-        return queueTask.backChannel;
+        return queueTask.getBackChannel();
     }
 
     public BlockingQueue<TaskStatus> addRegularTaskToQueue(Runnable task) {
         var queueTask = createQueueTask(task, TaskPriority.REGULAR, TimeUnit.MINUTES);
         queue.add(queueTask);
 
-        return queueTask.backChannel;
+        return queueTask.getBackChannel();
     }
 
     private QueueTask createQueueTask(Runnable task, TaskPriority priority, TimeUnit timeoutUnit) {
@@ -70,7 +70,7 @@ public class QueueService {
     private void cancelTask(QueueTask task) {
         log.info("Cancelling task {}", task);
         if (queue.remove(task)) {
-            task.backChannel.add(TaskStatus.TIMEOUT);
+            task.getBackChannel().add(TaskStatus.TIMEOUT);
         }
     }
 
@@ -85,17 +85,17 @@ public class QueueService {
                 continue;
             }
 
-            queueTask.cancelTask.cancel(true);
+            queueTask.getCancelTask().cancel(true);
 
             try {
-                queueTask.task.run();
+                queueTask.getTask().run();
             } catch (Exception e) {
                 log.error("Error when running task", e);
-                queueTask.backChannel.add(TaskStatus.ERROR);
+                queueTask.getBackChannel().add(TaskStatus.ERROR);
                 continue;
             }
 
-            queueTask.backChannel.add(TaskStatus.OK);
+            queueTask.getBackChannel().add(TaskStatus.OK);
         }
     }
 
