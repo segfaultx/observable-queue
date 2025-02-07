@@ -8,8 +8,6 @@ import lombok.ToString;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ScheduledFuture;
 
-@Getter
-@Setter
 @Builder
 @ToString
 class QueueTask {

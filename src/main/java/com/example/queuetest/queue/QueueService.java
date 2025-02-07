@@ -92,6 +92,7 @@ public class QueueService {
             } catch (Exception e) {
                 log.error("Error when running task", e);
                 queueTask.backChannel.add(TaskStatus.ERROR);
+                continue;
             }
 
             queueTask.backChannel.add(TaskStatus.OK);
